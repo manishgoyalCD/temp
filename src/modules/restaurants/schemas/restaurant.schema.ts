@@ -28,7 +28,7 @@ export class RestaurantEntity {
         unique: true,
         index: true,
     })
-    google_id: string;
+    source_id: string;
 
     @Prop({
         required: true,
@@ -51,7 +51,7 @@ export class RestaurantEntity {
         required: false,
         default: ""
     })
-    poster: string;
+    image: string;
 
     @Prop({
         required: false,
@@ -137,11 +137,19 @@ export class RestaurantEntity {
     dishes: [string];
 
     @Prop({
+        required: true,
         index: true,
-        type: Array,
-        default: [],
+        type: {
+            min: Number, 
+            max: {
+                type: Number,
+                default: null
+            },  
+            currency: String, 
+            text: String
+        }
     })
-    price_range: [PriceRange];
+    price: {min: number, max: number | null,  currency: string, text: string};
     
     @Prop({
         index: true,
@@ -149,6 +157,13 @@ export class RestaurantEntity {
         default: 0,
     })
     reviews_count: number;
+    
+    @Prop({
+        index: true,
+        type: String,
+        default: 'one-menus',
+    })
+    source: string;
 
     @Prop({
         index: true,

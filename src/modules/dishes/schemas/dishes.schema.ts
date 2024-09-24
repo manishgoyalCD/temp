@@ -23,12 +23,12 @@ export class DishesEntity {
         ref: RestaurantEntity.name
     })
     restaurant_id: Types.ObjectId;
-
+    
     @Prop({
         required: true,
         index: true,
     })
-    google_id: string;
+    source_id: string;
 
     @Prop({
         required: true,
@@ -45,20 +45,18 @@ export class DishesEntity {
     @Prop({
         required: true,
         index: true,
-    })
-    price: number;
-
-    @Prop({
-        required: false,
-        index: true,
-        validate: {
-            validator: function(value) {
-                return value > this.price;
-            },
-            message: 'Large price must be greater than regular price'
+        type: {
+            min: Number, 
+            max: {
+                type: Number,
+                default: null
+            },  
+            currency: String, 
+            text: String
         }
     })
-    price_large: number;
+    price: {min: number, max: number | null,  currency: string, text: string};
+    
     
     @Prop({
         required: false,
@@ -100,14 +98,14 @@ export class DishesEntity {
         index: false,
         default: []
     })
-    ingredients: [];
+    ingredients: [string];
 
     @Prop({
         required: false,
         index: false,
         default: []
     })
-    addons: [];
+    addons: [string];
 
     @Prop({
         required: false,

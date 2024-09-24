@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsNumber, IsString } from 'class-validator';
 import { number } from 'joi';
 import { Types, Document } from 'mongoose';
+import { DishesEntity } from 'src/modules/dishes/schemas/dishes.schema';
 import { RestaurantEntity } from 'src/modules/restaurants/schemas/restaurant.schema';
 import { UserEntity } from 'src/modules/user/schemas/user.schema';
 
@@ -14,14 +15,9 @@ import { UserEntity } from 'src/modules/user/schemas/user.schema';
 export class ReviewEntity {
     @Prop({
         required: true,
-    })
-    _id: Types.ObjectId;
-
-    @Prop({
-        required: false,
         index: true,
     })
-    google_id: string;
+    source_id: string;
     
     @Prop({
         required: true,
@@ -35,12 +31,22 @@ export class ReviewEntity {
         required: false,
         index: true,
         type: Types.ObjectId,
+        default: null,
+        ref: DishesEntity.name
+    })
+    dish_id: Types.ObjectId;
+
+    @Prop({
+        required: false,
+        index: true,
+        type: Types.ObjectId,
+        default: null,
         ref: ReviewEntity.name
     })
     review_id: Types.ObjectId;
 
     @Prop({
-        required: false,
+        required: true,
         index: true,
         type: Types.ObjectId,
         ref: UserEntity.name
@@ -78,6 +84,12 @@ export class ReviewEntity {
         type: [String]
     })
     videos: [string];
+
+    @Prop({
+        required: true,
+        index: false,
+    })
+    amenties: [any];
 
     @Prop({
         required: false,

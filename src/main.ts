@@ -1,12 +1,15 @@
-import { NestFactory } from '@nestjs/core';
+import { NestApplication, NestFactory } from '@nestjs/core';
 import { Logger, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { useContainer } from 'class-validator';
 import { DatabaseOptionsService } from 'src/common/database/services/database.options.service';
 import { AppModule } from 'src/modules/app/app.module';
+import { WrapResponseInterceptor } from './common/response/decorators/response.decorator';
+import { AllExceptionsFilter } from './common/exception_handler/exception_handler';
+// import swaggerInit from './swagger';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app: NestApplication = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService);
 
     const databaseOptionsService: DatabaseOptionsService = app.get(
@@ -30,6 +33,8 @@ async function bootstrap() {
     (process.env.NODE_ENV as any) = env;
 
     // Global
+    app.useGlobalInterceptors(new WrapResponseInterceptor());
+    app.useGlobalFilters(new AllExceptionsFilter());
     app.setGlobalPrefix(globalPrefix);
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
@@ -41,6 +46,9 @@ async function bootstrap() {
             prefix: versioningPrefix,
         });
     }
+
+    // Swagger
+    // await swaggerInit(app);
 
     await app.listen(port, host);
 

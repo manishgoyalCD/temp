@@ -33,7 +33,7 @@ export class UserEntity {
     @Prop({
         required: true,
         index: true,
-        unique: true,
+        // unique: true,
     })
     phone_no: number;
 
@@ -95,7 +95,7 @@ export class UserEntity {
             mime: String,
         },
     })
-    photo?: AwsS3Serialization;
+    photo?: AwsS3Serialization | "";
 
 
     @Prop({
@@ -110,7 +110,7 @@ export class UserEntity {
             mime: String,
         },
     })
-    poster?: AwsS3Serialization;
+    poster?: AwsS3Serialization | "";
 
     
 }
