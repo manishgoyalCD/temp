@@ -2,6 +2,9 @@ import { ConfigService } from '@nestjs/config';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { RestaurantDocument } from 'src/modules/restaurants/schemas/restaurant.schema';
+import { RestaurantSearchDto } from 'src/modules/restaurants/dto/restaurant-search.dto';
+import { RESTAURANT_DEFAULT_DISTANCE, RESTAURANT_DEFAULT_PER_PAGE } from 'src/modules/restaurants/constants/restaurant.constant';
+import { SearchHit, SearchTotalHits } from '@elastic/elasticsearch/lib/api/types';
 
 type dataResponse = {
   UnitPrice: number;
@@ -123,12 +126,10 @@ export class SearchService implements OnModuleInit {
           amenities: restaurant.amenities,
           cuisines: restaurant.cuisines,
           dishes: restaurant.dishes,
-          price: {
-            min: restaurant.price?.min,
-            max: restaurant.price?.max,
-            currency: restaurant.price?.currency,
-          },
+          price: restaurant.price,
+          currency: restaurant.currency,
           source: restaurant.source,
+          rating: restaurant.rating,
           reviews_count: restaurant.reviews_count,
           likes_count: restaurant.likes_count
         }
@@ -255,7 +256,102 @@ export class SearchService implements OnModuleInit {
     }
     });
     return response
-}
+  }
+
+
+  async searchRestaurants(filters: RestaurantSearchDto
+    //     {
+    //     page?: number;
+    //     dietary?: string[];
+    //     location?: { lat: number; lon: number };
+    //     distance?: number; // e.g., '10km'
+    //     price_range?: { min?: number; max?: number };
+    //     rating?: number;
+    //   }
+    ) {
+        const { page = 1, per_page, dietary, location, distance = RESTAURANT_DEFAULT_DISTANCE, price_range, rating, skip } = filters;
+        console.log({ page, per_page, dietary, location, distance, price_range, rating, skip } );
+        
+        const query: any = {
+          from: (page-1) * RESTAURANT_DEFAULT_PER_PAGE,
+          size: RESTAURANT_DEFAULT_PER_PAGE,
+          query: {
+            bool: {
+              must: [],
+              filter: [],
+            },
+          },
+        };
+    
+        // 1. Dietary filter (terms query for an array of dietary restrictions)
+        // if (dietary && dietary.length > 0) {
+        //   query.query.bool.filter.push({
+        //     terms: {
+        //       'dietary.keyword': dietary,
+        //     },
+        //   });
+        // }
+    
+        if (location && distance) {
+          query.query.bool.filter.push({
+            geo_distance: {
+              distance: `${distance}km`,
+              location: { 
+                lat: location.lat,
+                lon: location.lon,
+              },
+            },
+          });
+        }
+    
+        if (price_range) {
+          const priceFilter = {};
+          if (price_range.min && price_range.max) {
+            priceFilter['price'] = { gte: price_range.min, lte: price_range.max };
+          } else if (price_range.min) {
+            priceFilter['price'] = { gte: price_range.min };
+          } else if (price_range.max) {
+            priceFilter['price'] = { lte: price_range.max };
+          }
+          if (Object.keys(priceFilter).length > 0) {
+            query.query.bool.filter.push({
+              range: priceFilter
+            });
+          }
+        }      
+    
+        // 4. Rating filter (range query for rating)
+        if (rating !== undefined) {
+          query.query.bool.filter.push({
+            range: {
+              rating: {
+                gte: rating,
+              },
+            },
+          });
+        }
+    
+        const result = await this.esService.search({
+          index: 'restaurants', 
+          body: {
+            _source: true,
+            ...query,
+          },
+          from: (page - 1) * per_page, 
+          size: per_page, 
+        });
+        
+        const total: SearchTotalHits = result.hits.total as SearchTotalHits
+        return {
+          total: total.value, // Total number of hits
+          page: page, 
+          size: per_page,
+          result: result.hits.hits.map((hit:any) => ({
+            _id: hit._id,          
+            ...(hit._source as Record<string, any> ? hit._source : {}),
+          })),
+        };
+      }
 
 
 

@@ -5,6 +5,7 @@ import { RestaurantsService } from './services/restaurants.service';
 import { RestaurantsController } from './controllers/restaurants.controller';
 import { RestaurantEntity, RestaurantSchema, RestaurantDatabaseName } from './schemas/restaurant.schema';
 import { RestaurantRepository } from './repositories/restaurant.repository';
+import { SearchModule } from 'src/common/elastic_search/elastic_search.module';
 
 
 @Module({
@@ -20,6 +21,7 @@ import { RestaurantRepository } from './repositories/restaurant.repository';
       ],
       DATABASE_CONNECTION_NAME
     ),
+    SearchModule
   ],
   providers: [RestaurantsService, RestaurantRepository],
   exports: [RestaurantsService]

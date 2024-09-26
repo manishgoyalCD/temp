@@ -106,7 +106,6 @@ export class RedisService extends Redis implements OnModuleDestroy {
       // Convert the restaurant data into an array of key-value pairs for Redis
       const restaurantEntries = Object.entries(restaurantData).flat();
   
-      
       await this.hset(key, restaurantEntries)
 
       return true

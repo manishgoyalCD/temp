@@ -139,17 +139,23 @@ export class RestaurantEntity {
     @Prop({
         required: true,
         index: true,
-        type: {
-            min: Number, 
-            max: {
-                type: Number,
-                default: null
-            },  
-            currency: String, 
-            text: String
-        }
+        type: Number, 
     })
-    price: {min: number, max: number | null,  currency: string, text: string};
+    price: number;
+
+    @Prop({
+        required: true,
+        index: true,
+        type: String, 
+    })
+    currency: string;
+    
+    @Prop({
+        index: true,
+        type: Number,
+        default: 0.0,
+    })
+    rating: number;
     
     @Prop({
         index: true,

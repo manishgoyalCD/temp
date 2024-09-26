@@ -72,19 +72,19 @@ export function PaginationPage(page = PAGINATION_PAGE): any {
     );
 }
 
-// export function PaginationPerPage(perPage = PAGINATION_PER_PAGE): any {
-//     return applyDecorators(
-//         Expose(),
-//         Type(() => Number),
-//         Transform(({ value }) =>
-//             !value
-//                 ? perPage
-//                 : value > PAGINATION_MAX_PER_PAGE
-//                     ? PAGINATION_MAX_PER_PAGE
-//                     : value
-//         )
-//     );
-// }
+export function PaginationPerPage(perPage = PAGINATION_PER_PAGE): any {
+    return applyDecorators(
+        Expose(),
+        Type(() => Number),
+        Transform(({ value }) =>
+            !value
+                ? perPage
+                : value > PAGINATION_MAX_PER_PAGE
+                    ? PAGINATION_MAX_PER_PAGE
+                    : value
+        )
+    );
+}
 
 // export function PaginationSort(
 //     sort = PAGINATION_SORT,

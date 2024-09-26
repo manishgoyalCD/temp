@@ -5,6 +5,7 @@ import { RestaurantsService } from '../services/restaurants.service';
 import { RedisService } from 'src/common/redis/services/redis.service';
 import { PaginationService } from 'src/common/pagination/services/pagination.service';
 import { RestaurantGetDto } from '../dto/restaurant-get.dto';
+import { RestaurantSearchDto } from '../dto/restaurant-search.dto';
 
 
 @Controller('restaurants')
@@ -30,12 +31,42 @@ export class RestaurantsController {
         }
     }
     
-    @Get('/get')
+    @Get('/search')
     async restaurantsGet(
         @Query(){
-            page
-        }: RestaurantGetDto
+            page,
+            per_page,
+            dietary,
+            location,
+            distance,
+            price_range,
+            rating
+        }: RestaurantSearchDto
     ): Promise<any> {
+        console.log({page,
+            dietary,
+            location,
+            distance,
+            price_range,
+            rating});
+        const skip = await this.paginationService.skip(page, per_page)
+        const restaurants = await this.restaurantService.searchRestaurants({page,per_page,
+            dietary,
+            location,
+            distance,
+            price_range,
+            rating, skip})
+
+        const total = restaurants.total
+        const total_pages = await this.paginationService.totalPage(total, per_page)
+
+        return {
+            total,
+            total_pages,
+            page,
+            location,
+            restaurants: restaurants.result
+        }
         
     }
 

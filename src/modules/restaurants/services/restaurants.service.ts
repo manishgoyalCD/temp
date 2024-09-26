@@ -3,12 +3,17 @@ import { Types } from 'mongoose';
 // ---
 import { IDatabaseFindAllOptions } from 'src/common/database/interfaces/database.interface';
 import { RestaurantRepository } from '../repositories/restaurant.repository';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
+import { RESTAURANT_DEFAULT_DISTANCE, RESTAURANT_DEFAULT_PER_PAGE } from '../constants/restaurant.constant';
+import { RestaurantSearchDto } from '../dto/restaurant-search.dto';
+import { SearchService } from 'src/common/elastic_search/services/elastic_search.service';
 
 @Injectable()
 export class RestaurantsService {
     
     constructor(
-        private readonly restaurantRepository: RestaurantRepository
+        private readonly restaurantRepository: RestaurantRepository,
+        private readonly searchService: SearchService
     ) {}
 
     create(cat:any) {
@@ -36,5 +41,9 @@ export class RestaurantsService {
         return this.restaurantRepository.findAll<T>(find, options);
     }
 
+
+    async searchRestaurants(filters: RestaurantSearchDto){
+        return this.searchService.searchRestaurants(filters)
+    }
 
 }

@@ -37,32 +37,13 @@ export class CreateRestaurantIndexMigration {
               plush_code: { type: 'keyword' },
               description: { type: 'text' },
               location: {
-                properties: {
-                  type: { type: 'keyword' },
-                  coordinates: { type: 'geo_point' }
-                }
+                  type: 'geo_point'
               },
-              images: {
-                type: 'nested',
-                properties: {
-                  image: { type: 'text' }
-                }
-              },
+              images:  {type: 'text' },
               open_hours: { type: 'object' },
-              amenties: {
-                type: 'nested',
-                properties: {
-                  amenity: { type: 'text' }
-                }
-              },
-              cuisines: {
-                type: 'nested',
-                properties: {
-                  cuisine: { type: 'text' }
-                }
-              },
+              amenties: { type: 'text' },
+              cuisines: { type: 'text' },
               dishes: { type: 'text' },
-              
               price: {
                 properties: {
                   min: { type: 'double' },

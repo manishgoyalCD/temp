@@ -45,18 +45,24 @@ export class DishesEntity {
     @Prop({
         required: true,
         index: true,
-        type: {
-            min: Number, 
-            max: {
-                type: Number,
-                default: null
-            },  
-            currency: String, 
-            text: String
-        }
+        type: Number,
     })
-    price: {min: number, max: number | null,  currency: string, text: string};
+    price: number;
     
+    @Prop({
+        required: true,
+        index: true,
+        type: String,
+        default: "$"
+    })
+    currency: string;
+
+    @Prop({
+        required: true,
+        index: true,
+        type: String,
+    })
+    price_text: string;
     
     @Prop({
         required: false,
@@ -114,8 +120,7 @@ export class DishesEntity {
     })
     is_veg: boolean;
 
-    
-    
+
 }
 
 export const DishesDatabaseName = 'dishes';

@@ -1,5 +1,5 @@
 import { NestApplication, NestFactory } from '@nestjs/core';
-import { Logger, VersioningType } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { useContainer } from 'class-validator';
 import { DatabaseOptionsService } from 'src/common/database/services/database.options.service';
@@ -33,6 +33,10 @@ async function bootstrap() {
     (process.env.NODE_ENV as any) = env;
 
     // Global
+    app.useGlobalPipes(new ValidationPipe({
+        transform: true, // Enable transformation
+        // whitelist: true, // Optional: strip properties that are not in the DTO
+      }));
     app.useGlobalInterceptors(new WrapResponseInterceptor());
     app.useGlobalFilters(new AllExceptionsFilter());
     app.setGlobalPrefix(globalPrefix);
