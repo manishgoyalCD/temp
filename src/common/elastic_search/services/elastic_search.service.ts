@@ -123,7 +123,7 @@ export class SearchService implements OnModuleInit {
           },
           images: restaurant.images,
           opening_hours: restaurant.opening_hours,
-          amenities: restaurant.amenities,
+          amenities: restaurant.amenties,
           cuisines: restaurant.cuisines,
           dishes: restaurant.dishes,
           price: restaurant.price,
@@ -259,99 +259,123 @@ export class SearchService implements OnModuleInit {
   }
 
 
-  async searchRestaurants(filters: RestaurantSearchDto
-    //     {
-    //     page?: number;
-    //     dietary?: string[];
-    //     location?: { lat: number; lon: number };
-    //     distance?: number; // e.g., '10km'
-    //     price_range?: { min?: number; max?: number };
-    //     rating?: number;
-    //   }
-    ) {
-        const { page = 1, per_page, dietary, location, distance = RESTAURANT_DEFAULT_DISTANCE, price_range, rating, skip } = filters;
-        console.log({ page, per_page, dietary, location, distance, price_range, rating, skip } );
-        
-        const query: any = {
-          from: (page-1) * RESTAURANT_DEFAULT_PER_PAGE,
-          size: RESTAURANT_DEFAULT_PER_PAGE,
-          query: {
-            bool: {
-              must: [],
-              filter: [],
-            },
-          },
-        };
+  async searchRestaurants(filters: RestaurantSearchDto) {
+    const { page = 1, search, per_page = RESTAURANT_DEFAULT_PER_PAGE, dietary, location, distance = RESTAURANT_DEFAULT_DISTANCE, price_range, rating, skip, sort } = filters;
+    console.log({ page, search, per_page, dietary, location, distance, price_range, rating, skip } );
+    console.log(sort);
     
-        // 1. Dietary filter (terms query for an array of dietary restrictions)
-        // if (dietary && dietary.length > 0) {
-        //   query.query.bool.filter.push({
-        //     terms: {
-        //       'dietary.keyword': dietary,
-        //     },
-        //   });
-        // }
+    const query: any = {
+      from: (page-1) * per_page,
+      size: per_page,
+      query: {
+        bool: {
+          must: [],
+          filter: [],
+        },
+      },
+      sort: []
+    };
     
-        if (location && distance) {
-          query.query.bool.filter.push({
-            geo_distance: {
-              distance: `${distance}km`,
-              location: { 
-                lat: location.lat,
-                lon: location.lon,
-              },
-            },
-          });
+    // 1. Dietary filter (terms query for an array of dietary restrictions)
+    // if (dietary && dietary.length > 0) {
+    //   query.query.bool.filter.push({
+    //     terms: {
+    //       'dietary.keyword': dietary,
+    //     },
+    //   });
+    // }
+    
+    // 2. Search query for name, dishes, cuisines, amanities
+    if (search) {
+      query.query.bool.must.push({
+        multi_match: {
+          query: search,
+          fields: ['name', 'dishes', 'cuisines', 'amanities']
         }
+      });
+    }
     
-        if (price_range) {
-          const priceFilter = {};
-          if (price_range.min && price_range.max) {
-            priceFilter['price'] = { gte: price_range.min, lte: price_range.max };
-          } else if (price_range.min) {
-            priceFilter['price'] = { gte: price_range.min };
-          } else if (price_range.max) {
-            priceFilter['price'] = { lte: price_range.max };
-          }
-          if (Object.keys(priceFilter).length > 0) {
-            query.query.bool.filter.push({
-              range: priceFilter
-            });
-          }
-        }      
-    
-        // 4. Rating filter (range query for rating)
-        if (rating !== undefined) {
-          query.query.bool.filter.push({
-            range: {
-              rating: {
-                gte: rating,
-              },
-            },
-          });
-        }
-    
-        const result = await this.esService.search({
-          index: 'restaurants', 
-          body: {
-            _source: true,
-            ...query,
+    if (location && distance) {
+      query.query.bool.filter.push({
+        geo_distance: {
+          distance: `${distance}km`,
+          location: { 
+            lat: location.lat,
+            lon: location.lon,
           },
-          from: (page - 1) * per_page, 
-          size: per_page, 
-        });
-        
-        const total: SearchTotalHits = result.hits.total as SearchTotalHits
-        return {
-          total: total.value, // Total number of hits
-          page: page, 
-          size: per_page,
-          result: result.hits.hits.map((hit:any) => ({
-            _id: hit._id,          
-            ...(hit._source as Record<string, any> ? hit._source : {}),
-          })),
-        };
+        },
+      });
+    }
+    
+    // 3. Price
+    if (price_range) {
+      const priceFilter = {};
+      if (price_range.min && price_range.max) {
+        priceFilter['price'] = { gte: price_range.min, lte: price_range.max };
+      } else if (price_range.min) {
+        priceFilter['price'] = { gte: price_range.min };
+      } else if (price_range.max) {
+        priceFilter['price'] = { lte: price_range.max };
       }
+      if (Object.keys(priceFilter).length > 0) {
+        query.query.bool.filter.push({
+          range: priceFilter
+        });
+      }
+    }      
+    
+    // 4. Rating filter (range query for rating)
+    if (rating !== undefined) {
+      query.query.bool.filter.push({
+        range: {
+          rating: {
+            gte: rating,
+          },
+        },
+      });
+    }
+    
+    // 5. Dynamic sort field for multiple fields
+    if (sort) {
+      Object.entries(sort).forEach(([field, value]) => {
+        console.log([field, value]);
+        const order = value < 0 ? 'desc' : 'asc'
+        if (field == 'rating' || field == 'price') {
+          query.sort.push({ [field]: { order } });
+        } else if (field == 'location') {
+          query.sort.push({ _geo_distance: {
+              location: { lat: location.lat, lon: location.lon },
+              order: order,
+              unit: 'km',
+              distance_type: 'plane',
+              mode: 'min'
+            }
+          });
+        }
+      });
+    }
+    
+    const result = await this.esService.search({
+      index: 'restaurants', 
+      body: {
+        _source: true,
+        ...query,
+      },
+      from: (page - 1) * per_page, 
+      size: per_page, 
+    });
+    
+    const total: SearchTotalHits = result.hits.total as SearchTotalHits
+    return {
+      total: total.value, // Total number of hits
+      page: page, 
+      size: per_page,
+      result: result.hits.hits.map((hit:any) => ({
+        _id: hit._id,          
+        ...(hit._source as Record<string, any> ? hit._source : {}),
+      })),
+    };
+  }
 
 
 

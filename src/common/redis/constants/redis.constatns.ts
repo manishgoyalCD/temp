@@ -1,0 +1,1 @@
+export const REDIS_DEFAULT_TTL = 20

@@ -99,6 +99,14 @@ export class ReviewEntity {
     })
     is_verified: boolean;
 
+    @Prop({
+        required: false,
+        index: true,
+        type: Date,
+        default: undefined
+    })
+    deletedAt?: boolean;
+
 
 }
 

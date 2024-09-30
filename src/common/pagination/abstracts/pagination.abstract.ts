@@ -1,20 +1,20 @@
 import { IPaginationSort } from 'src/common/pagination/interfaces/pagination.interface';
 
 export abstract class PaginationListAbstract {
-    abstract search?: Record<string, any>;
+    abstract search?: string;
     abstract availableSearch?: string[];
     abstract page?: number;
-    abstract perPage: number;
+    abstract per_page?: number;
     abstract sort?: IPaginationSort;
-    abstract availableSort?: string[];
+    abstract available_sort?: string[];
 }
 
 export abstract class PaginationSimpleListAbstract {
     abstract search?: string;
     abstract page?: number;
-    abstract perPage: number;
+    abstract per_page: number;
 }
 
 export abstract class PaginationMiniListAbstract {
-    abstract perPage: number;
+    abstract per_page: number;
 }

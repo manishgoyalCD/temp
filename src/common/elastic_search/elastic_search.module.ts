@@ -22,4 +22,4 @@ dotenv.config();
   providers: [SearchService],
   exports: [SearchService],
 })
-export class SearchModule {}
+export class EsSearchModule {}

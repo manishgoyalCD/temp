@@ -1,3 +1,8 @@
+// export enum ENUM_PAGINATION_AVAILABLE_SORT_TYPE {
+//     ASC = 'asc',
+//     DESC = 'desc',
+// }
+
 export enum ENUM_PAGINATION_AVAILABLE_SORT_TYPE {
     ASC = 1,
     DESC = -1,

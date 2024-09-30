@@ -1,11 +1,11 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { SetMetadata } from '@nestjs/common';
 import { PaginationPage, PaginationPerPage, PaginationSort } from 'src/common/pagination/decorators/pagination.decorator';
-import { TransformDistance, TransformLatLong, TransformPriceRange } from '../decorators/restaurant.decorator';
+import { TransformDistance, TransformLatLong, TransformPriceRange } from '../decorators/search.decorator';
 import { Type } from 'class-transformer';
 import { PaginationListAbstract } from 'src/common/pagination/abstracts/pagination.abstract';
 import { IPaginationSort } from 'src/common/pagination/interfaces/pagination.interface';
-import { RESTAURANT_DEFAULT_AVAILABLE_SORT, RESTAURANT_DEFAULT_DISTANCE, RESTAURANT_DEFAULT_SORT } from '../constants/restaurant.constant';
+import { RESTAURANT_DEFAULT_AVAILABLE_SORT, RESTAURANT_DEFAULT_DISTANCE, RESTAURANT_DEFAULT_SORT } from '../constants/search.constant';
 
 // export const ArticleGet = (...args: string[]) => SetMetadata('get-restaurants', args);
 

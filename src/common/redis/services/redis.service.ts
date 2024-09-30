@@ -3,9 +3,11 @@ import Redis from 'ioredis';
 import { ConfigType } from '@nestjs/config';
 import redisConfig from 'src/configs/redis.config'
 import { RestaurantDocument } from 'src/modules/restaurants/schemas/restaurant.schema';
+import { REDIS_DEFAULT_TTL } from '../constants/redis.constatns';
 
 
 const RESTAURANT_KEY = 'onemenu.hash.restaurant'
+const DISHES_LIST_KEY = 'onemenu.string.dishes'
 
 /**
  * This service should be used by modules that require direct access to ioredis client. The rest should use
@@ -86,8 +88,8 @@ export class RedisService extends Redis implements OnModuleDestroy {
     
   }
 
-  // async setRestaurant(restaurant: RestaurantDocument){
-  async setRestaurant(restaurant: any){
+
+  async setRestaurant(restaurant: any, ttl=REDIS_DEFAULT_TTL){
     try{
       const _id = restaurant._id.toString()
       const key = `${RESTAURANT_KEY}.${_id}`
@@ -118,5 +120,91 @@ export class RedisService extends Redis implements OnModuleDestroy {
     
   }
 
+
+  // Dishes
+  async getDishesList(query: any, options:any={}){
+    try{
+      const _id = query.restaurant_id.toString()
+      let key = `${DISHES_LIST_KEY}.${_id}`
+      
+      if(query['type']){
+        key += `.${query.type}`
+      }
+
+      if(options['page']){
+        key += `.${options.page}`
+      }
+
+      if(options['per_page']){
+        key += `.${options.per_page}`
+      }
+      console.log(key);
+      
+      const dish_string = await this.get(key)
+      if(!dish_string) return null;
+
+      const dishes_data = JSON.parse(dish_string)
+
+      const dishes_result = []
+
+      for(const dish of dishes_data){
+        dishes_result.push({
+          ...dish,
+          images: JSON.parse(dish.images),
+          videos: JSON.parse(dish.videos),
+          ingredients: JSON.parse(dish.ingredients),
+          addons: JSON.parse(dish.addons),
+        })
+      }
+      return {
+        total: dishes_result.length, // Total number of hits
+        result: dishes_result
+      }
+    } catch(err){
+      console.log(err);
+      console.log("Error in getting  restaurant in redis - ");
+      return null
+    } 
+  }
+  
+
+  async setDishesList(query:any, dishes: any, options:any={}, ttl=REDIS_DEFAULT_TTL){
+    try{
+      const _id = query.restaurant_id.toString()
+      let key = `${DISHES_LIST_KEY}.${_id}`
+      
+      if(query['type']){
+        key += `.${query.type}`
+      }
+
+      if(options['page']){
+        key += `.${options.page}`
+      }
+
+      if(options['per_page']){
+        key += `.${options.per_page}`
+      }
+      console.log(key);
+      
+      
+      const dishesData = dishes.map(dish => ({
+        ...dish,
+        images: JSON.stringify(dish.images),
+        videos: JSON.stringify(dish.videos),
+        ingredients: JSON.stringify(dish.ingredients),
+        addons: JSON.stringify(dish.addons),
+      }));
+
+      await this.set(key, JSON.stringify(dishesData))
+      this.expire(key, ttl)
+
+      return true
+    } catch(err){
+      console.log(err);
+      console.log("Error in setting dishes in redis - ");
+      return false
+    }
+    
+  }
 
 }

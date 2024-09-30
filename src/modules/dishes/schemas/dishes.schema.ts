@@ -88,9 +88,9 @@ export class DishesEntity {
     @Prop({
         required: true,
         index: false,
-        type: [String]
+        type: String
     })
-    type: [string];
+    type: string;
     
     @Prop({
         required: false,

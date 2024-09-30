@@ -120,7 +120,7 @@ export class RestaurantEntity {
         type: Array,
         default: [],
     })
-    amenities: [];
+    amenties: [];
 
     @Prop({
         index: false,
@@ -178,6 +178,13 @@ export class RestaurantEntity {
     })
     likes_count: number;
 
+    @Prop({
+        required: false,
+        index: true,
+        type: Date,
+        default: undefined
+    })
+    deletedAt?: boolean;
     
 }
 

@@ -6,6 +6,7 @@ import { RedisService } from 'src/common/redis/services/redis.service';
 import { PaginationService } from 'src/common/pagination/services/pagination.service';
 import { RestaurantGetDto } from '../dto/restaurant-get.dto';
 import { RestaurantSearchDto } from '../dto/restaurant-search.dto';
+import { RestaurantGetDefaultDto } from '../dto/restaurant-getdefault.dto';
 
 
 @Controller('restaurants')
@@ -18,14 +19,19 @@ export class RestaurantsController {
 
 
     @Get('/')
-    async root(): Promise<any> {
-        return {
-            'status': 'ok'
-        }
-    }
-
-    @Get('/')
-    async findAll(): Promise<any> {
+    async getDefault(
+        @Query(){
+            location,
+            dietary,
+            distance,
+            sort
+        }: RestaurantGetDefaultDto
+    ): Promise<any> {
+        // const restaurants = await this.restaurantService.searchRestaurants({
+        //     dietary,
+        //     location,
+        //     distance,
+        //     sort})
         return {
             'status': 'ok'
         }
@@ -36,26 +42,22 @@ export class RestaurantsController {
         @Query(){
             page,
             per_page,
+            search,
             dietary,
             location,
             distance,
             price_range,
-            rating
+            rating,
+            sort
         }: RestaurantSearchDto
     ): Promise<any> {
-        console.log({page,
-            dietary,
-            location,
-            distance,
-            price_range,
-            rating});
         const skip = await this.paginationService.skip(page, per_page)
-        const restaurants = await this.restaurantService.searchRestaurants({page,per_page,
+        const restaurants = await this.restaurantService.searchRestaurants({page,per_page,search,
             dietary,
             location,
             distance,
             price_range,
-            rating, skip})
+            rating, skip, sort})
 
         const total = restaurants.total
         const total_pages = await this.paginationService.totalPage(total, per_page)

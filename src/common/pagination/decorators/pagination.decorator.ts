@@ -86,31 +86,32 @@ export function PaginationPerPage(perPage = PAGINATION_PER_PAGE): any {
     );
 }
 
-// export function PaginationSort(
-//     sort = PAGINATION_SORT,
-//     availableSort = PAGINATION_AVAILABLE_SORT
-// ): any {
-//     return applyDecorators(
-//         Expose(),
-//         Transform(({ value, obj }) => {
-//             const bSort = PAGINATION_SORT.split('@')[0];
+export function PaginationSort(
+    sort = PAGINATION_SORT,
+    availableSort = PAGINATION_AVAILABLE_SORT
+): any {
+    return applyDecorators(
+        Expose(),
+        Transform(({ value, obj }) => {
+            
+            const bSort = PAGINATION_SORT.split('@')[0];
 
-//             const rSort = value || sort;
-//             const rAvailableSort = obj._availableSort || availableSort;
-//             const field: string = rSort.split('@')[0];
-//             const type: string = rSort.split('@')[1];
-//             const convertField: string = rAvailableSort.includes(field)
-//                 ? field
-//                 : bSort;
-//             const convertType: number =
-//                 type === 'desc'
-//                     ? ENUM_PAGINATION_AVAILABLE_SORT_TYPE.DESC
-//                     : ENUM_PAGINATION_AVAILABLE_SORT_TYPE.ASC;
+            const rSort = value || sort;
+            const rAvailableSort = obj._availableSort || availableSort;
+            const field: string = rSort.split('@')[0];
+            const type: string = rSort.split('@')[1];
+            const convertField: string = rAvailableSort.includes(field)
+                ? field
+                : bSort;
+            const convertType: number =
+                type === 'desc'
+                    ? ENUM_PAGINATION_AVAILABLE_SORT_TYPE.DESC
+                    : ENUM_PAGINATION_AVAILABLE_SORT_TYPE.ASC;
 
-//             return { [convertField]: convertType };
-//         })
-//     );
-// }
+            return { [convertField]: convertType };
+        })
+    );
+}
 
 // export function PaginationAvailableSort(
 //     availableSort = PAGINATION_AVAILABLE_SORT
@@ -213,6 +214,32 @@ export function PaginationPerPage(perPage = PAGINATION_PER_PAGE): any {
 //     );
 // }
 
+// export function PaginationByIdToken(): any {
+//     return applyDecorators(
+//         Expose(),
+//         // Type(() => Number),
+//         Transform(({ value }) => {
+//             if(!value){
+//                 return null
+//             }
+//             if(isMongoId(value)){
+//                 return value;
+//             }
+//             const jsonData = atob(value);
+//             const dataObject = JSON.parse(jsonData);
+//             class PaginationByIdCls {
+//                 first_latest_article_id: string;
+//                 last_batch: Number;
+//                 batch_from: string;
+//                 city_last_article_id: string;
+//                 nearby_last_article_id: string;
+//                 state_last_article_id: string;
+//             }
+//             return plainToClass(PaginationByIdCls, dataObject);
+//         }
+//         )
+//     );
+// }
 // export function PaginationByIdToken(): any {
 //     return applyDecorators(
 //         Expose(),

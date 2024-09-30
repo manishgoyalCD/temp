@@ -1,6 +1,6 @@
 import { applyDecorators, createParamDecorator, ExecutionContext, BadRequestException } from '@nestjs/common';
 import { Expose, Transform, Type } from 'class-transformer';
-import { RESTAURANT_DEFAULT_DISTANCE } from '../constants/restaurant.constant';
+import { RESTAURANT_DEFAULT_DISTANCE } from '../constants/search.constant';
 
 
 class Location {

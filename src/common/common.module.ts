@@ -4,7 +4,7 @@ import Joi from 'joi';
 import configs from 'src/configs';
 import { DatabaseModule } from 'src/common/database/database.module';
 import { RedisModule } from 'src/common/redis/redis.module';
-import { SearchModule } from './elastic_search/elastic_search.module';
+import { EsSearchModule } from './elastic_search/elastic_search.module';
 import { PaginationModule } from './pagination/pagination.module';
 
 @Global()
@@ -87,7 +87,7 @@ import { PaginationModule } from './pagination/pagination.module';
         PaginationModule,
         DatabaseModule,
         RedisModule,
-        SearchModule,
+        EsSearchModule,
     ],
 })
 export class CommonModule {}
