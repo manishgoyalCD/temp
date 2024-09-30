@@ -10,7 +10,7 @@ import { RestaurantIdDto } from 'src/modules/restaurants/dto/restaurantId.dto';
 @Controller('review')
 export class ReviewController {
     constructor(
-        private readonly ReviewService: ReviewService,
+        private readonly reviewService: ReviewService,
         private readonly redisService: RedisService,
         private readonly paginationService: PaginationService
     ) {}
@@ -33,7 +33,7 @@ export class ReviewController {
 
     */
     @Get('/:RESTAURANT_ID/get')
-    async getAllComments(
+    async getRestaurantReview(
         @Query(){
             page,
             per_page,
@@ -42,9 +42,19 @@ export class ReviewController {
         }:RestaurantGetDto,
         @Param('RESTAURANT_ID') restaurant_id: string
     ): Promise<any> {
+        console.log({
+            page,
+            per_page,
+            sort,
+            rating
+        });
+        
         const skip = await this.paginationService.skip(page, per_page)
-        const query = {'restaurant_id': new Types.ObjectId(restaurant_id)}
         const options = {}
+        const query = {
+            'restaurant': new Types.ObjectId(restaurant_id),
+            'review_id': null
+        }
         if(rating){
             query['rating'] = {
                 $gte: rating
@@ -52,6 +62,8 @@ export class ReviewController {
         }
         if(skip){
             options['skip'] = skip
+        } else {
+            options['skip'] = 0
         }
         if(per_page){
             options['limit'] = per_page
@@ -60,13 +72,78 @@ export class ReviewController {
             options['sort'] = sort
         }
 
-        await this.ReviewService.getRestaurantReview(query, options)
-
+        const reviews = await this.reviewService.getRestaurantReview(query, options)
+        const total_page = await this.paginationService.totalPage(reviews.total, per_page)
         return {
-            dish : "",
+            total: reviews.total,
+            total_page: total_page,
+            page: page,
+            result: reviews.result.length,
+            review: reviews.result,
         }
     }
 
+    @Get('/:RESTAURANT_ID/:REVIEW_ID/get')
+    async getAllSubReview(
+        @Query(){
+            page,
+            per_page,
+            sort,
+            rating
+        }:RestaurantGetDto,
+        @Param('RESTAURANT_ID') restaurant_id: string,
+        @Param('REVIEW_ID') review_id: string
+    ): Promise<any> {
+        console.log({
+            page,
+            per_page,
+            sort,
+            rating,
+            review_id,
+            restaurant_id
+        });
+        
+        const skip = await this.paginationService.skip(page, per_page)
+        const options = {}
+        const query = {'restaurant': new Types.ObjectId(restaurant_id), "review_id":  new Types.ObjectId(review_id)}
+        if(rating){
+            query['rating'] = {
+                $gte: rating
+            }
+        }
+        if(skip){
+            options['skip'] = skip
+        } else {
+            options['skip'] = 0
+        }
+        if(per_page){
+            options['limit'] = per_page
+        }
+        if(sort){
+            options['sort'] = sort
+        }
+
+        const reviews = await this.reviewService.getSubReview(query, options)
+        const total_page = await this.paginationService.totalPage(reviews.total, per_page)
+        return {
+            total: reviews.total,
+            total_page: total_page,
+            page: page,
+            result: reviews.result.length,
+            review: reviews.result,
+        }
+    }
+
+    @Get('/:RESTAURANT_ID/overall-rating')
+    async getOverAllRating(
+        @Param('RESTAURANT_ID') restaurant_id: string
+    ): Promise<any> {
+        
+        return {
+            ratings: await this.reviewService.getRestaurantOverallRating(restaurant_id)
+        }
+    }
+        
     @Get('/:COMMENT_ID/get')
     async getComment(): Promise<any> {
         return {

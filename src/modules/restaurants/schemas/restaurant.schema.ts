@@ -163,6 +163,13 @@ export class RestaurantEntity {
         default: 0,
     })
     reviews_count: number;
+
+    @Prop({
+        index: false,
+        type: Object,
+        default: null,
+    })
+    overall_reviews: object;
     
     @Prop({
         index: true,

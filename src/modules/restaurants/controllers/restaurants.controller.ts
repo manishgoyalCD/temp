@@ -66,6 +66,7 @@ export class RestaurantsController {
             total,
             total_pages,
             page,
+            result: restaurants.result.length,
             location,
             restaurants: restaurants.result
         }
@@ -94,4 +95,12 @@ export class RestaurantsController {
     ): Promise<any> {
         return null;
     }
+
+    // GET Restaurant images
+
+    // Get menus
+
+    // Get similar restaurants
+
+    // 
 }

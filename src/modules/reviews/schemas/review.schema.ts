@@ -13,19 +13,14 @@ import { UserEntity } from 'src/modules/user/schemas/user.schema';
 }, versionKey: false })
 
 export class ReviewEntity {
-    @Prop({
-        required: true,
-        index: true,
-    })
-    source_id: string;
-    
+
     @Prop({
         required: true,
         index: true,
         type: Types.ObjectId,
         ref: RestaurantEntity.name
     })
-    restaurant_id: Types.ObjectId;
+    restaurant: Types.ObjectId;
 
     @Prop({
         required: false,
@@ -34,7 +29,7 @@ export class ReviewEntity {
         default: null,
         ref: DishesEntity.name
     })
-    dish_id: Types.ObjectId;
+    dish: Types.ObjectId;
 
     @Prop({
         required: false,
@@ -43,7 +38,7 @@ export class ReviewEntity {
         default: null,
         ref: ReviewEntity.name
     })
-    review_id: Types.ObjectId;
+    review: Types.ObjectId;
 
     @Prop({
         required: true,
@@ -51,7 +46,7 @@ export class ReviewEntity {
         type: Types.ObjectId,
         ref: UserEntity.name
     })
-    user_id: Types.ObjectId;
+    user: Types.ObjectId;
 
     @Prop({
         required: true,

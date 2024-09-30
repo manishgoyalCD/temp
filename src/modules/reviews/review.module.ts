@@ -5,6 +5,7 @@ import { ReviewService } from './services/review.service';
 import { ReviewController } from './controllers/review.controller';
 import { ReviewEntity, ReviewSchema, ReviewDatabaseName } from './schemas/review.schema';
 import { ReviewRepository } from './repositories/review.repository';
+import { RestaurantsModule } from '../restaurants/restaurants.module';
 
 
 @Module({
@@ -20,9 +21,10 @@ import { ReviewRepository } from './repositories/review.repository';
       ],
       DATABASE_CONNECTION_NAME
     ),
+    RestaurantsModule
   ],
-  providers: [ReviewService, ReviewRepository],
-  exports: [ReviewService]
+  providers: [ReviewService, ReviewRepository, ],
+  exports: [ReviewService, ]
 })
 export class ReviewsModule {}
 

@@ -16,9 +16,8 @@ export class RestaurantGetDto {
     page?: number;
 
     @ApiProperty({
-    default: 20
+        default: 20
     })
-    @PaginationPage()
     @Type(()=>Number)
     @PaginationPerPage()
     per_page: number;
