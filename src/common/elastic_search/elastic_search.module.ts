@@ -14,6 +14,10 @@ dotenv.config();
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) =>({
         node: `http://${configService.get<string>('elastic.host')}:${configService.get<number>('elastic.port')}`,
+        auth: {
+          username: configService.get<string>('elastic.username'),
+          password: configService.get<string>('elastic.password'),
+        },
       }),
       inject: [ConfigService],
     }),

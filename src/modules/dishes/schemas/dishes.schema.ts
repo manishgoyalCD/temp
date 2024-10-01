@@ -22,7 +22,7 @@ export class DishesEntity {
         type: Types.ObjectId,
         ref: RestaurantEntity.name
     })
-    restaurant_id: Types.ObjectId;
+    restaurant: Types.ObjectId;
     
     @Prop({
         required: true,

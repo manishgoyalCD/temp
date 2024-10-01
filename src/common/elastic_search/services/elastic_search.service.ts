@@ -39,16 +39,12 @@ export class SearchService implements OnModuleInit {
         body: {
           mappings: {
             properties: {
-              _id: { type: 'keyword' },
-              source_id: { type: 'keyword' },
+              // _id: { type: 'keyword' },
               name: { type: 'text' },
-              phone_no: { type: 'text' },
-              website: { type: 'text' },
               image: { type: 'text' },
               city: { type: 'text' },
               state: { type: 'text' },
               address: { type: 'text' },
-              plush_code: { type: 'keyword' },
               description: { type: 'text' },
               location: {
                   type: 'geo_point'
