@@ -14,12 +14,16 @@ export class DishesController {
         private readonly paginationService: PaginationService
     ) {}
 
+    @Get('/')
+    async getDefaultDishes(){
+        return null;
+    }
 
     @Get('/:RESTAURANT_ID/get')
     async getRestaurantDishes(
         @Query(){
-            page = 1,
-            per_page = 20,
+            page,
+            per_page,
             type,
             price_range,
             rating,
@@ -27,10 +31,18 @@ export class DishesController {
         }: DishesGetDto,
         @Param('RESTAURANT_ID')restaurant_id: string
     ): Promise<any> {
-
+        console.log({
+            page,
+            per_page,
+            type,
+            price_range,
+            rating,
+            sort
+        });
+        
         const skip = await this.paginationService.skip(page, per_page)
         const options = {}
-        const find = {'restaurant_id': new Types.ObjectId(restaurant_id)}
+        const find = {'restaurant': new Types.ObjectId(restaurant_id)}
         if(rating){
             find['rating'] = {
                 $gte: rating
@@ -61,6 +73,35 @@ export class DishesController {
             total: dishes.total,
             total_pages: total_page,
             page: page,
+            result: dishes.result.length,
+            dishes: dishes.result
+        }
+    }
+
+    @Get('/:RESTAURANT_ID/group-by-type')
+    async getGroupDishes(
+        @Query(){
+            type,
+            sort
+        }: DishesGetDto,
+        @Param('RESTAURANT_ID')restaurant_id: string
+    ): Promise<any> {
+
+        const options = {}
+        const find = {'restaurant': new Types.ObjectId(restaurant_id)}
+        let redis_key = `${type || '$type'}`
+        const groupBy = {
+            _id: type || '$type'
+        }
+       
+        if(sort){
+            let redis_key = `s.${options['sort']}${sort}`
+            options['sort'] = sort
+        }
+
+        const dishes = await this.dishesService.getGroupDishes(find,groupBy, options, redis_key)
+        
+        return {
             dishes: dishes.result
         }
     }

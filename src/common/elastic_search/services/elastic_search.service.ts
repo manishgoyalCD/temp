@@ -19,23 +19,28 @@ type dataResponse = {
 
 @Injectable()
 export class SearchService implements OnModuleInit {
+  restaurantIndex: string
+  dishesIndex: string
+
   constructor(
     private readonly esService: ElasticsearchService,
     private readonly configService: ConfigService,
-  ) {}
+  ) {
+    this.restaurantIndex = this.configService.get<string>('elastic.index.restaurant')
+    this.dishesIndex = this.configService.get<string>('elastic.index.dishes')
+  }
 
   async onModuleInit() {
     await this.createIndexWithMapping();
   }
 
   async createIndexWithMapping() {
-    const index = 'restaurants';
 
-    const isIndexExists = await this.esService.indices.exists({ index });
+    const isIndexExists = await this.esService.indices.exists({ index: this.restaurantIndex });
     
     if (!isIndexExists) {
       await this.esService.indices.create({
-        index,
+        index: this.restaurantIndex,
         body: {
           mappings: {
             properties: {
@@ -89,29 +94,29 @@ export class SearchService implements OnModuleInit {
           }
         }
       });
-      console.log(`Created index ${index} with mapping`);
+      console.log(`Created index ${this.restaurantIndex} with mapping`);
     } else {
-      console.log(`Index ${index} already exists`);
+      console.log(`Index ${this.restaurantIndex} already exists`);
     }
   }
 
   async insertRestaurantDocument(restaurant:RestaurantDocument) {
-    const index = 'restaurants';
+    
     try {
       const result = await this.esService.index({
-        index,
+        index: this.restaurantIndex,
         id: restaurant._id.toString(),  // Use the _id.$oid as the document ID
         body: {
-          _id: restaurant._id.toString(),
-          source_id: restaurant.source_id,
+          // _id: restaurant._id.toString(),
+          // source_id: restaurant.source_id,
           name: restaurant.name,
-          phone_no: restaurant.phone_no,
-          website: restaurant.website,
+          // phone_no: restaurant.phone_no,
+          // website: restaurant.website,
           image: restaurant.image,
           city: restaurant.city,
           state: restaurant.state,
           address: restaurant.address,
-          plush_code: restaurant.plush_code,
+          // plush_code: restaurant.plush_code,
           description: restaurant.description,
           location: {
             type: restaurant.location.type,
@@ -127,7 +132,8 @@ export class SearchService implements OnModuleInit {
           source: restaurant.source,
           rating: restaurant.rating,
           reviews_count: restaurant.reviews_count,
-          likes_count: restaurant.likes_count
+          likes_count: restaurant.likes_count,
+          overall_reviews: restaurant.overall_reviews
         }
       });
 
@@ -352,7 +358,7 @@ export class SearchService implements OnModuleInit {
     }
     
     const result = await this.esService.search({
-      index: 'restaurants', 
+      index: this.restaurantIndex, 
       body: {
         _source: true,
         ...query,

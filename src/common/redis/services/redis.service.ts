@@ -3,7 +3,7 @@ import Redis from 'ioredis';
 import { ConfigType } from '@nestjs/config';
 import redisConfig from 'src/configs/redis.config'
 import { RestaurantDocument } from 'src/modules/restaurants/schemas/restaurant.schema';
-import { REDIS_DEFAULT_TTL } from '../constants/redis.constatns';
+import { REDIS_DEFAULT_TTL } from '../constants/redis.constant';
 
 
 const RESTAURANT_KEY = 'onemenu.hash.restaurant'
@@ -78,11 +78,12 @@ export class RedisService extends Redis implements OnModuleDestroy {
       ...restaurant, 
       location: JSON.parse(restaurant.location), 
       images: JSON.parse(restaurant.images),     
-      open_hours: JSON.parse(restaurant.open_hours), 
+      opening_hours: restaurant.opening_hours ? JSON.parse(restaurant.opening_hours) : null, 
       amenties: JSON.parse(restaurant.amenties),  
       cuisines: JSON.parse(restaurant.cuisines),  
       dishes: JSON.parse(restaurant.dishes),      
-      price: JSON.parse(restaurant.price)         
+      price: parseFloat(restaurant.price),
+      overall_reviews: restaurant.overall_reviews ?  JSON.parse(restaurant.overall_reviews) : null
     };
     return restaurantData
     
@@ -98,17 +99,19 @@ export class RedisService extends Redis implements OnModuleDestroy {
         ...restaurant, 
         location: JSON.stringify(restaurant.location), 
         images: JSON.stringify(restaurant.images),     
-        open_hours: JSON.stringify(restaurant.open_hours), 
+        opening_hours: JSON.stringify(restaurant.opening_hours), 
         amenties: JSON.stringify(restaurant.amenties),  
         cuisines: JSON.stringify(restaurant.cuisines),  
         dishes: JSON.stringify(restaurant.dishes),      
-        price: JSON.stringify(restaurant.price)         
+        price: JSON.stringify(restaurant.price),
+        overall_reviews: restaurant.overall_reviews ?  JSON.stringify(restaurant.overall_reviews) : null         
       };
   
       // Convert the restaurant data into an array of key-value pairs for Redis
       const restaurantEntries = Object.entries(restaurantData).flat();
   
-      await this.hset(key, restaurantEntries)
+      this.hset(key, restaurantEntries)
+      this.expire(key, ttl)
 
       return true
     } catch(err){
@@ -124,7 +127,7 @@ export class RedisService extends Redis implements OnModuleDestroy {
   // Dishes
   async getDishesList(query: any, options:any={}){
     try{
-      const _id = query.restaurant_id.toString()
+      const _id = query.restaurant.toString()
       let key = `${DISHES_LIST_KEY}.${_id}`
       
       if(query['type']){
@@ -138,7 +141,11 @@ export class RedisService extends Redis implements OnModuleDestroy {
       if(options['per_page']){
         key += `.${options.per_page}`
       }
-      console.log(key);
+
+      if(options['sort']){
+        key += `.${options.sort}${options.sort}`
+      }
+      console.log('get', key);
       
       const dish_string = await this.get(key)
       if(!dish_string) return null;
@@ -170,7 +177,7 @@ export class RedisService extends Redis implements OnModuleDestroy {
 
   async setDishesList(query:any, dishes: any, options:any={}, ttl=REDIS_DEFAULT_TTL){
     try{
-      const _id = query.restaurant_id.toString()
+      const _id = query.restaurant.toString()
       let key = `${DISHES_LIST_KEY}.${_id}`
       
       if(query['type']){
@@ -184,7 +191,7 @@ export class RedisService extends Redis implements OnModuleDestroy {
       if(options['per_page']){
         key += `.${options.per_page}`
       }
-      console.log(key);
+      console.log('set', key);
       
       
       const dishesData = dishes.map(dish => ({

@@ -6,7 +6,7 @@ import { PaginationPage, PaginationPerPage, PaginationSort } from 'src/common/pa
 import { IPaginationSort } from 'src/common/database/interfaces/database.interface';
 import { REVIEW_DEFAULT_AVAILABLE_SORT, REVIEW_DEFAULT_SORT } from '../constants/review.constants';
 
-export class RestaurantGetDto {
+export class ReviewGetDto {
    
     @ApiProperty({
         default: 20

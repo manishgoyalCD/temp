@@ -1,10 +1,10 @@
 import { Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
 import { ReviewService } from '../services/review.service';
 import { RedisService } from 'src/common/redis/services/redis.service';
-import { RestaurantGetDto } from '../dto/review-get.dto';
+import { ReviewGetDto } from '../dto/review-get.dto';
 import { PaginationService } from 'src/common/pagination/services/pagination.service';
 import { Types } from 'mongoose';
-import { RestaurantIdDto } from 'src/modules/restaurants/dto/restaurantId.dto';
+import { SubReviewDto } from '../dto/sub-review.dto';
 
 
 @Controller('review')
@@ -39,7 +39,7 @@ export class ReviewController {
             per_page,
             sort,
             rating
-        }:RestaurantGetDto,
+        }:ReviewGetDto,
         @Param('RESTAURANT_ID') restaurant_id: string
     ): Promise<any> {
         console.log({
@@ -90,7 +90,7 @@ export class ReviewController {
             per_page,
             sort,
             rating
-        }:RestaurantGetDto,
+        }:SubReviewDto,
         @Param('RESTAURANT_ID') restaurant_id: string,
         @Param('REVIEW_ID') review_id: string
     ): Promise<any> {
@@ -105,7 +105,7 @@ export class ReviewController {
         
         const skip = await this.paginationService.skip(page, per_page)
         const options = {}
-        const query = {'restaurant': new Types.ObjectId(restaurant_id), "review_id":  new Types.ObjectId(review_id)}
+        const query = {'restaurant': new Types.ObjectId(restaurant_id), "review":  new Types.ObjectId(review_id)}
         if(rating){
             query['rating'] = {
                 $gte: rating

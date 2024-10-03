@@ -83,9 +83,10 @@ export class RestaurantsController {
 
         if(!restaurant){
             restaurant = await this.restaurantService.findOne({_id: new Types.ObjectId(restaurant_id)})
-            this.redisService.setRestaurant(restaurant)
+            this.redisService.setRestaurant(restaurant, 0)
         }
         return restaurant
+
     }
 
 

@@ -2,13 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { IDatabaseFindAllOptions, IDatabaseOptions } from 'src/common/database/interfaces/database.interface';
 import { ReviewRepository } from '../repositories/review.repository';
 import { RedisService } from 'src/common/redis/services/redis.service';
-import { REDIS_DEFAULT_TTL } from 'src/common/redis/constants/redis.constatns';
-import { query } from 'express';
+import { REDIS_DEFAULT_TTL } from 'src/common/redis/constants/redis.constant';
 import { RestaurantsService } from 'src/modules/restaurants/services/restaurants.service';
-import mongoose, { Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { RestaurantDocument } from 'src/modules/restaurants/schemas/restaurant.schema';
 import { ReviewDocument } from '../schemas/review.schema';
-
 
 const REVIEW_LIST_KEY = 'onemenu.string.reviews'
 const REVIEW_HASH_KEY = 'onemenu.hash.review'

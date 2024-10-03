@@ -6,6 +6,7 @@ import { Type } from 'class-transformer';
 import { PaginationListAbstract } from 'src/common/pagination/abstracts/pagination.abstract';
 import { IPaginationSort } from 'src/common/pagination/interfaces/pagination.interface';
 import { RESTAURANT_DEFAULT_AVAILABLE_SORT, RESTAURANT_DEFAULT_DISTANCE, RESTAURANT_DEFAULT_SORT } from '../constants/restaurant.constant';
+import { IsEmpty, IsNotEmpty } from 'class-validator';
 
 // export const ArticleGet = (...args: string[]) => SetMetadata('get-restaurants', args);
 
@@ -38,6 +39,7 @@ export class RestaurantSearchDto implements PaginationListAbstract {
     distance?: number
     
     @ApiProperty()
+    @IsNotEmpty()
     @TransformLatLong()
     location: {lat:number, lon: number}
 
@@ -52,6 +54,7 @@ export class RestaurantSearchDto implements PaginationListAbstract {
     @Type(()=>String)
     dietary: string
   
+    
     @ApiHideProperty()
     @Type(()=>Number)
     skip?: number
