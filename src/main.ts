@@ -6,6 +6,8 @@ import { DatabaseOptionsService } from 'src/common/database/services/database.op
 import { AppModule } from 'src/modules/app/app.module';
 import { WrapResponseInterceptor } from './common/response/decorators/response.decorator';
 import { AllExceptionsFilter } from './common/exception_handler/exception_handler';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 // import swaggerInit from './swagger';
 
 async function bootstrap() {
@@ -52,6 +54,15 @@ async function bootstrap() {
     }
 
     // Swagger
+    const config = new DocumentBuilder()
+    .setTitle('OneMenus Api')
+    .setDescription('This is the OneMenus API Swagger')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document, {
+    swaggerUiEnabled: true
+  });
     // await swaggerInit(app);
 
     await app.listen(port, host);

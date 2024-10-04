@@ -4,8 +4,9 @@ import { RedisService } from 'src/common/redis/services/redis.service';
 import { PaginationService } from 'src/common/pagination/services/pagination.service';
 import { DishesGetDto } from '../dto/dishes-get.dto';
 import { Types } from 'mongoose';
+import { ApiBadRequestResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('Dishes')
 @Controller('dishes')
 export class DishesController {
     constructor(
@@ -20,6 +21,23 @@ export class DishesController {
     }
 
     @Get('/:RESTAURANT_ID/get')
+    @ApiOkResponse({
+        description: "Restaurant Dishes fetched Successfully",
+        example: {
+            total: 100,
+            total_pages: 10,
+            page: 1,
+            result: 100,
+            dishes: []
+        }
+    })
+    @ApiBadRequestResponse({
+        description: "Enter all the required fields",
+        example: {
+            status: 400,
+            message: "Required Fields are mandatory"
+        }
+    })
     async getRestaurantDishes(
         @Query(){
             page,
@@ -79,6 +97,20 @@ export class DishesController {
     }
 
     @Get('/:RESTAURANT_ID/group-by-type')
+    @ApiOkResponse({
+        description:"Dishes have been grouped Successfully",
+        type: Promise<any>,
+        example: {
+            dishes: []
+        }
+    })
+    @ApiBadRequestResponse({
+        description: "Enter all the required fields",
+        example: {
+            status: 400,
+            message: "Required Fields are mandatory"
+        }
+    })
     async getGroupDishes(
         @Query(){
             type,

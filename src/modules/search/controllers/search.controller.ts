@@ -7,7 +7,7 @@ import { PaginationService } from 'src/common/pagination/services/pagination.ser
 import { RestaurantGetDto } from '../dto/search-get.dto';
 import { RestaurantSearchDto } from '../dto/search-search.dto';
 import { RestaurantGetDefaultDto } from '../dto/search-getdefault.dto';
-
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('restaurants')
 export class SearchController {

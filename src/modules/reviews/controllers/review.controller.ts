@@ -1,12 +1,13 @@
-import { Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
 import { ReviewService } from '../services/review.service';
 import { RedisService } from 'src/common/redis/services/redis.service';
 import { ReviewGetDto } from '../dto/review-get.dto';
 import { PaginationService } from 'src/common/pagination/services/pagination.service';
 import { Types } from 'mongoose';
 import { SubReviewDto } from '../dto/sub-review.dto';
+import { ApiCreatedResponse, ApiResponse, ApiOkResponse, ApiBadRequestResponse, ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('Reviews')
 @Controller('review')
 export class ReviewController {
     constructor(
@@ -33,6 +34,25 @@ export class ReviewController {
 
     */
     @Get('/:RESTAURANT_ID/get')
+    @ApiResponse({
+    status: 201, 
+    description: 'The reviews have been fetched successfully.',
+    example:{
+        total: 100,
+        total_page: 10,
+        page: 1,
+        result: 100,
+        review: [],
+    }
+    })
+    @ApiBadRequestResponse({
+        status: 400,
+        description: "Enter all the required fields",
+        example: {
+            status: 400,
+            message: "Required Fields are mandatory"
+        }
+    })
     async getRestaurantReview(
         @Query(){
             page,
@@ -84,6 +104,24 @@ export class ReviewController {
     }
 
     @Get('/:RESTAURANT_ID/:REVIEW_ID/get')
+    @ApiOkResponse({
+        type: Promise<any>,
+        description: "Sub-reviews fetched successfully",
+        example: {
+            total: 100,
+            total_page: 10,
+            page: 1,
+            result: 100,
+            review: [],
+        }
+    })
+    @ApiBadRequestResponse({
+        description: "Enter all the required Fields",
+        example: {
+            status: 400,
+            message: "Required fields are mandatory"
+        }
+    })
     async getAllSubReview(
         @Query(){
             page,
@@ -135,6 +173,20 @@ export class ReviewController {
     }
 
     @Get('/:RESTAURANT_ID/overall-rating')
+    @ApiOkResponse({
+        type: Promise<any>,
+        description: "Overall rating fetched successfully",
+        example: {
+            ratings: {}
+        }
+    })
+    @ApiBadRequestResponse({
+        description: "Enter all the required Fields",
+        example: {
+            status: 400,
+            message: "Required fields are mandatory"
+        }
+    })
     async getOverAllRating(
         @Param('RESTAURANT_ID') restaurant_id: string
     ): Promise<any> {
@@ -154,7 +206,6 @@ export class ReviewController {
 
 
     @Post('/:COMMENT_ID/like')
-    @HttpCode(200)
     async likeComment(): Promise<any> {
         return {
             dish : "",

@@ -7,8 +7,10 @@ import { PaginationService } from 'src/common/pagination/services/pagination.ser
 import { RestaurantGetDto } from '../dto/restaurant-get.dto';
 import { RestaurantSearchDto } from '../dto/restaurant-search.dto';
 import { RestaurantGetDefaultDto } from '../dto/restaurant-getdefault.dto';
+import { ApiBadRequestResponse, ApiBody, ApiQuery, ApiCreatedResponse, ApiOkResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 
 
+@ApiTags('Restaurants')
 @Controller('restaurants')
 export class RestaurantsController {
     constructor(
@@ -19,6 +21,14 @@ export class RestaurantsController {
 
 
     @Get('/')
+    @ApiBadRequestResponse({
+        description: "Enter all the required fields", 
+        type: Promise<any>,
+        example: {
+            status: 400,
+            message: "Required fields are mandatory"
+        }
+    })
     async getDefault(
         @Query(){
             location,
@@ -38,6 +48,26 @@ export class RestaurantsController {
     }
     
     @Get('/search')
+    @ApiOkResponse({
+        description: 'The search query has been executed successfully.',
+        type: Promise<any>,
+        example: {
+            total:100,
+            total_pages:10,
+            page:1,
+            result: 20,
+            location:{lon:30.1345425123, lat:21.3543435},
+            restaurants: []
+        }
+      })
+      @ApiBadRequestResponse({
+        description: "Enter all the required fields", 
+        type: Promise<any>,
+        example: {
+            status: 400,
+            message: "Required fields are mandatory"
+        }
+    })
     async restaurantsGet(
         @Query(){
             page,
@@ -73,7 +103,34 @@ export class RestaurantsController {
         
     }
 
-    @Get('/:RESTAURANT_ID/get')
+    @Get('/:RESTAURANT_ID')
+    @ApiParam({
+        name:'RESTAURANT_ID',
+        type: 'string',
+        required: true
+    })
+    @ApiOkResponse({
+        description: "The Restaurant has been found successfully",
+        type: Promise<any>,
+        example:{
+            location: {},
+            images: [],
+            opening_hours: [],
+            amenties: [],
+            cuisines: [],
+            dishes: [],
+            price: 100.4,
+            overall_reviews: [],
+        }
+    })
+    @ApiBadRequestResponse({
+        description: "Enter all the required fields", 
+        type: Promise<any>,
+        example: {
+            status: 400,
+            message: "Required fields are mandatory"
+        }
+    })
     async RestaurantDetails(
         @Param('RESTAURANT_ID') restaurant_id: string
     ): Promise<any> {
@@ -82,15 +139,29 @@ export class RestaurantsController {
         let restaurant = await this.redisService.getRestaurant(restaurant_id)
 
         if(!restaurant){
-            restaurant = await this.restaurantService.findOne({_id: new Types.ObjectId(restaurant_id)})
+            restaurant = await this.restaurantService.findOne({_id: new Types.ObjectId(restaurant_id)})            
             this.redisService.setRestaurant(restaurant, 0)
         }
+        
         return restaurant
 
     }
 
 
     @Get('/:RESTAURANT_ID/menus/get')
+    @ApiParam({
+        name:'RESTAURANT_ID',
+        type: 'string',
+        required: true
+    })
+    @ApiBadRequestResponse({
+        description: "Enter all the required fields", 
+        type: Promise<any>,
+        example: {
+            status: 400,
+            message: "Required fields are mandatory"
+        }
+    })
     async RestaurantGetMenus(
         
     ): Promise<any> {
@@ -105,3 +176,6 @@ export class RestaurantsController {
 
     // 
 }
+
+
+

@@ -1,8 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { RedisService } from 'src/common/redis/services/redis.service';
+import { ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('User')
 @Controller('user')
 export class UserController {
     constructor(
